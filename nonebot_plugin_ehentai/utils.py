@@ -9,6 +9,7 @@ import aiofiles
 import aiohttp
 import img2pdf
 from nonebot import logger, require
+from pypdf import PdfReader, PdfWriter
 
 from .config import config
 
@@ -31,10 +32,11 @@ base_headers = {
 # - 'https://(?:e-|ex)hentai.org/g/' 匹配e-hentai或ex-hentai画廊链接的基本URL部分
 # - '(\d+)' 匹配并捕获整数形式的画廊ID
 # - '(/[a-f0-9]+)' 匹配并捕获一组小写十六进制字符，作为画廊的唯一标识符（hash或token）
-# pattern_gallery_url = r"https://(?:e-|ex)hentai.org/g/(\d+)/([a-f0-9]+)"
-pattern_gallery_url = r"https://test.org/g/(\d+)/([a-f0-9]+)"
+pattern_gallery_url = r"https://(?:e-|ex)hentai.org/g/(\d+)/([a-f0-9]+)"
 
 re_gid_token = re.compile(pattern_gallery_url)
+
+timeout = aiohttp.ClientTimeout(total=15)
 
 
 def parse_gallery_url(url: str) -> tuple:
@@ -91,23 +93,22 @@ async def download_archive(gid: str, token: str, chunk_size=102400):
     :param headers: 请求头:cookie/referer等
     :param chunk_size: 内容块大小，单位是字节
     """
-    resolve_data = await resolve_gallery(gid, token, True)
-    archive_url = resolve_data["data"]["archive_url"]
-    logger.debug(f"archive_url: {archive_url}")
-
     file_path = DATA_DIR / f"{gid}_{token}.zip"
     downloading_path = file_path.with_suffix(".td")
 
+    # 若有重名文件，退出
+    if os.path.exists(file_path):
+        logger.debug(f"重名文件：{file_path}")
+        return file_path
+
+    resolve_data = await resolve_gallery(gid, token)
+    archive_url = resolve_data["data"]["archive_url"]
+
     # 限制协程并发量
     async with semaphore:
-        # 若有重名文件，退出
-        if os.path.exists(file_path):
-            logger.debug(f"重名文件：{file_path}")
-            return
         # 定义待下载文件的文件格式是.td
         headers = base_headers.copy()
 
-        timeout = aiohttp.ClientTimeout(total=15)
         async with aiohttp.ClientSession() as session:
             # 指定循环次数
             for i in range(3):
@@ -119,16 +120,12 @@ async def download_archive(gid: str, token: str, chunk_size=102400):
                 # 指定请求文件内容的范围
                 headers["Range"] = f"bytes={file_content_length}-"
                 try:
-                    async with session.get(
-                        archive_url, timeout=timeout, headers=headers
-                    ) as response:
+                    async with session.get(archive_url, headers=headers) as response:
                         # 请求部分内容时的状态码是206
                         if response.status in [200, 206]:
                             # 把遍历返回的块内容异步写入待下载文件中
                             async with aiofiles.open(downloading_path, "ab") as fw:
-                                async for chunk in response.content.iter_chunked(
-                                    chunk_size
-                                ):
+                                async for chunk in response.content.iter_chunked(chunk_size):
                                     await fw.write(chunk)
                             # 文件下载完成，修改文件格式为原来格式
                             os.rename(downloading_path, file_path)
@@ -140,15 +137,22 @@ async def download_archive(gid: str, token: str, chunk_size=102400):
                         logger.debug(f"请求失败{i + 1}次：{downloading_path}")
                         continue
                     logger.debug(f"其他异常：{exception} - {archive_url}")
-                # 其他情形退出循环
-                break
-            # 如果下载失败，删除待下载文件
-            if os.path.exists(downloading_path):
-                os.remove(downloading_path)
+
             logger.error(f"文件下载失败：{file_path}")
 
 
-async def zip2pdf(gid: str, zip_path: Path) -> Path:
+def encrypt_pdf(pdf_path: Path, password: str):
+    reader = PdfReader(pdf_path)
+    writer = PdfWriter(clone_from=reader)
+
+    # 使用id作为密码
+    writer.encrypt(password, algorithm="AES-256")
+
+    with open(pdf_path, "wb") as f:
+        writer.write(f)
+
+
+async def zip2pdf(zip_path: Path) -> Path:
     """将zip压缩包解压后的所有图片按顺序通过img2pdf拼接成pdf文件
 
     Args:
@@ -158,6 +162,9 @@ async def zip2pdf(gid: str, zip_path: Path) -> Path:
         Path: 生成的PDF文件路径
     """
     pdf_path = zip_path.with_suffix(".pdf")
+    # 如果PDF文件已经存在，直接返回
+    if pdf_path.exists():
+        return pdf_path
     # 创建临时目录用于解压文件
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
@@ -185,7 +192,41 @@ async def zip2pdf(gid: str, zip_path: Path) -> Path:
             with open(pdf_path, "wb") as f:
                 f.write(pdf_data)
 
+            if config.pdf_pwd:
+                # 使用gid作为密码
+                pwd = zip_path.stem.split("_")[0]
+                encrypt_pdf(pdf_path, pwd)
+
             return pdf_path
         except Exception as e:
             logger.error(f"生成PDF文件失败: {e}")
             raise e
+
+
+async def get_pdf_with_pwd(gid: str, token: str) -> Path | None:
+    """将zip压缩包解压后的所有图片按顺序通过img2pdf拼接成pdf文件
+
+    Args:
+        zip_path (Path): zip文件路径
+
+    Returns:
+    """
+    zip_path = await download_archive(gid, token)
+    logger.info(f"下载完成: {zip_path}")
+    if zip_path:
+        pdf_path = await zip2pdf(zip_path)
+
+        return pdf_path
+    else:
+        return None
+
+
+async def get_pdf(url) -> tuple[Path | None, str]:
+    """获取pdf文件
+    Args:
+        url (str): 画廊链接
+    Returns:
+        tuple: pdf文件路径, 密码
+    """
+    gid, token = parse_gallery_url(url)
+    return await get_pdf_with_pwd(gid, token), gid

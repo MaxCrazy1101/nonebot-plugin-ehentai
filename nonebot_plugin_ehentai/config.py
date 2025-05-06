@@ -3,6 +3,12 @@ from pydantic import BaseModel, Field
 
 
 class ScopedConfig(BaseModel):
+    ehurl: str = "https://exhentai.org/"
+    """eh URL"""
+    cookie: str = ""
+    """eh cookie"""
+    proxy: str = ""
+    """eh proxy"""
     base_api: str = "https://eh-arc-api.mhdy.icu"
     """archive bot URL"""
     apikey: str = ""

@@ -6,23 +6,23 @@
 
 <div align="center">
 
-# nonebot-plugin-example
+# nonebot-plugin-ehentai
 
 _✨ 你的插件简述 ✨_
 
 <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/owner/nonebot-plugin-example.svg" alt="license">
+    <img src="https://img.shields.io/github/license/MaxCrazy1101/nonebot-plugin-ehentai.svg" alt="license">
 </a>
-<a href="https://pypi.python.org/pypi/nonebot-plugin-example">
-    <img src="https://img.shields.io/pypi/v/nonebot-plugin-example.svg" alt="pypi">
+<a href="https://pypi.python.org/pypi/nonebot-plugin-ehentai">
+    <img src="https://img.shields.io/pypi/v/nonebot-plugin-ehentai.svg" alt="pypi">
 </a>
 <img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="python">
 <br>
-<a href="https://results.pre-commit.ci/latest/github/owner/nonebot-plugin-example/master">
-    <img src="https://results.pre-commit.ci/badge/github/owner/nonebot-plugin-example/master.svg" alt="pre-commit.ci status">
+<a href="https://results.pre-commit.ci/latest/github/MaxCrazy1101/nonebot-plugin-ehentai/master">
+    <img src="https://results.pre-commit.ci/badge/github/MaxCrazy1101/nonebot-plugin-ehentai/master.svg" alt="pre-commit.ci status">
 </a>
-<a href="https://registry.nonebot.dev/plugin/nonebot-plugin-example:nonebot_plugin_example">
-  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnbbdg.lgc2333.top%2Fplugin%2Fnonebot-plugin-example" alt="NoneBot Registry" />
+<a href="https://registry.nonebot.dev/plugin/nonebot-plugin-ehentai:nonebot_plugin_example">
+  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnbbdg.lgc2333.top%2Fplugin%2Fnonebot-plugin-ehentai" alt="NoneBot Registry" />
 </a>
 <a href="https://github.com/astral-sh/uv">
     <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv">
@@ -30,7 +30,7 @@ _✨ 你的插件简述 ✨_
 <a href="https://github.com/astral-sh/ruff">
 <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json" alt="ruff">
 </a>
-<a href="https://www.codefactor.io/repository/github/owner/nonebot-plugin-example"><img src="https://www.codefactor.io/repository/github/owner/nonebot-plugin-example/badge" alt="CodeFactor" />
+<a href="https://www.codefactor.io/repository/github/MaxCrazy1101/nonebot-plugin-ehentai"><img src="https://www.codefactor.io/repository/github/MaxCrazy1101/nonebot-plugin-ehentai/badge" alt="CodeFactor" />
 </a>
 
 </div>
@@ -45,7 +45,7 @@ _✨ 你的插件简述 ✨_
 <summary>使用 nb-cli 安装</summary>
 在 nonebot2 项目的根目录下打开命令行, 输入以下指令即可安装
 
-    nb plugin install nonebot-plugin-example
+    nb plugin install nonebot-plugin-ehentai
 
 </details>
 
@@ -56,27 +56,27 @@ _✨ 你的插件简述 ✨_
 <details>
 <summary>pip</summary>
 
-    pip install nonebot-plugin-example
+    pip install nonebot-plugin-ehentai
 </details>
 <details>
 <summary>pdm</summary>
 
-    pdm add nonebot-plugin-example
+    pdm add nonebot-plugin-ehentai
 </details>
 <details>
 <summary>poetry</summary>
 
-    poetry add nonebot-plugin-example
+    poetry add nonebot-plugin-ehentai
 </details>
 <details>
 <summary>conda</summary>
 
-    conda install nonebot-plugin-example
+    conda install nonebot-plugin-ehentai
 </details>
 
 打开 nonebot2 项目根目录下的 `pyproject.toml` 文件, 在 `[tool.nonebot]` 部分追加写入
 
-    plugins = ["nonebot_plugin_example"]
+    plugins = ["nonebot_plugin_ehentai"]
 
 </details>
 
@@ -88,8 +88,13 @@ _✨ 你的插件简述 ✨_
 
 | 配置项 | 必填 | 默认值 | 说明 |
 |:-----:|:----:|:----:|:----:|
-| 配置项 1 | 否 | 无 | 配置说明 |
-| 配置项 2 | 否 | 无 | 配置说明 |
+| `eh__proxy` | 否 | 无 | 是否需要代理 |
+| `eh__ehurl` | 否 | 默认里站地址 | url，与cookie对应 |
+| `eh__cookie` | 否 | 无 | cookie |
+| `eh__base_api` | 否 | - | 归档机器人api |
+| `eh__apikey` | 是 | 无 | 归档机器人apikey |
+| `eh__pdf_pwd` | 否 | False | 是否需要密码 |
+| `eh__client` | 否 | False | 配置说明 |
 
 ## 🎉 使用
 
@@ -100,8 +105,8 @@ _✨ 你的插件简述 ✨_
 
 | 指令 | 权限 | 参数 | 说明 |
 |:-----:|:----:|:----:|:----:|
-| 指令1 | 所有 | 无 | 指令说明 |
-| 指令2 | 所有 | `无` or `@` | 指令说明 |
+| 画廊网址 | 所有 | 无 | 指令说明 |
+| eh "标题" | 所有 | `无` or `@` | 注意双引号 |
 
 ### 📸 效果图
 
