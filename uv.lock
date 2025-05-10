@@ -209,15 +209,6 @@ wheels = [
 ]
 
 [[package]]
-name = "asyncio"
-version = "3.4.3"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/da/54/054bafaf2c0fb8473d423743e191fcdf49b2c1fd5e9af3524efbe097bafd/asyncio-3.4.3.tar.gz", hash = "sha256:83360ff8bc97980e4ff25c964c7bd3923d333d177aa4f7fb736b019f26c7cb41", size = 204411, upload_time = "2015-03-10T14:11:26.494Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/22/74/07679c5b9f98a7cb0fc147b1ef1cc1853bc07a4eb9cb5731e24732c5f773/asyncio-3.4.3-py3-none-any.whl", hash = "sha256:c4d18b22701821de07bd6aea8b53d21449ec0ec5680645e5317062ea21817d2d", size = 101767, upload_time = "2015-03-10T14:05:10.959Z" },
-]
-
-[[package]]
 name = "attrs"
 version = "25.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -814,7 +805,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.57.4"
+version = "0.57.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "arclet-alconna" },
@@ -825,9 +816,9 @@ dependencies = [
     { name = "nonebot2" },
     { name = "tarina" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c4/73/b85e548387d9723549ea810912dc2e4431abad373225b897a79dc4f6e64a/nonebot_plugin_alconna-0.57.4.tar.gz", hash = "sha256:3bca31c1f8360f9d460b7cbef4bcc714f2d04212470b2b3a3a1d01de3e42d110", size = 148239, upload_time = "2025-04-29T11:03:16.043Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/85/a8/fe2262eee769e734d1cee4d7327a34cad1f471ed6edb441a8a16200137d8/nonebot_plugin_alconna-0.57.6.tar.gz", hash = "sha256:f22357cf784358205b8ae76707627fd28d1a73b594e38b239619be4eea9fe6ae", size = 148980, upload_time = "2025-05-10T11:01:09.252Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/78/d4f5e5c5d34b6371cf86abcc00fcde30d54d8abeef0e23cfe50d979dac8c/nonebot_plugin_alconna-0.57.4-py3-none-any.whl", hash = "sha256:b20dbf003b9515e5d0b7a01813b6a998383cf342cbe5b2dd4bf8b0c96dcb60fc", size = 204092, upload_time = "2025-04-29T11:03:14.755Z" },
+    { url = "https://files.pythonhosted.org/packages/87/cc/eebe0b289770772964f22f959f743d9e0764560871b179a6b16db99aaa6b/nonebot_plugin_alconna-0.57.6-py3-none-any.whl", hash = "sha256:7690f4f1bfc1be8755080eea3554582cafe9cb44c1a1f270e30922d3d1f8358d", size = 205162, upload_time = "2025-05-10T11:01:07.466Z" },
 ]
 
 [[package]]
@@ -846,14 +837,12 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-ehentai"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
-    { name = "asyncio" },
     { name = "img2pdf" },
-    { name = "nonebot-adapter-onebot" },
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot-plugin-apscheduler" },
     { name = "nonebot-plugin-localstore" },
@@ -874,9 +863,7 @@ dev = [
 requires-dist = [
     { name = "aiofiles", specifier = ">=24.1.0" },
     { name = "aiohttp", specifier = ">=3.11.18" },
-    { name = "asyncio", specifier = ">=3.4.3" },
     { name = "img2pdf", specifier = ">=0.6.1" },
-    { name = "nonebot-adapter-onebot", specifier = ">=2.4.6,<3.0.0" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.54.2,<1.0.0" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0,<1.0.0" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4,<1.0.0" },
