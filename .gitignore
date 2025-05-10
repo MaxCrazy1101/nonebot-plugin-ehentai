@@ -183,4 +183,4 @@ bot.py
 
 .DS_Store
 
-env.test
+.env.test

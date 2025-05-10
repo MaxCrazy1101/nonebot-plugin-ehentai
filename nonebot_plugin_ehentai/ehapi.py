@@ -91,9 +91,10 @@ async def eh_checkin() -> str:
             data = await resp.text()
     # 解析是否签到成功
     if "eventpane" in data:
+        logger.info("EH签到成功")
         return "签到成功"
     else:
-        logger.info(data)
+        logger.warning("EH签到失败")
         return "签到失败，可能是cookie错误或已签到"
 
 

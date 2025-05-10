@@ -75,12 +75,16 @@ async def resolve_gallery(gid: str, token: str, force_resolve: bool = False) -> 
         "token": token,
         "force_resolve": force_resolve,
     }
+    logger.info(f"payload: {payload}")
+    logger.info(f"url: {url}")
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=payload) as resp:
             if resp.status == 200:
                 data = await resp.json()
                 if data["code"] != 0:
-                    logger.error(f"解析失败: {data['msg']} (错误码: {data['code']})")
+                    logger.error(f"payload: {payload}")
+                    logger.error(f"response: {await resp.text()}")
+                    raise Exception("归档机器人解析失败")
                 return data
             else:
                 raise Exception(f"请求失败，状态码: {resp.status}")
@@ -102,7 +106,11 @@ async def download_archive(gid: str, token: str, chunk_size=102400):
         return file_path
 
     resolve_data = await resolve_gallery(gid, token)
-    archive_url = resolve_data["data"]["archive_url"]
+    try:
+        archive_url = resolve_data["data"]["archive_url"]
+    except KeyError:
+        logger.error(f"archive_url error: {resolve_data}")
+        raise Exception("archive_url error")
 
     # 限制协程并发量
     async with semaphore:
@@ -125,12 +133,14 @@ async def download_archive(gid: str, token: str, chunk_size=102400):
                         if response.status in [200, 206]:
                             # 把遍历返回的块内容异步写入待下载文件中
                             async with aiofiles.open(downloading_path, "ab") as fw:
-                                async for chunk in response.content.iter_chunked(chunk_size):
+                                async for chunk in response.content.iter_chunked(
+                                    chunk_size
+                                ):
                                     await fw.write(chunk)
                             # 文件下载完成，修改文件格式为原来格式
                             os.rename(downloading_path, file_path)
                             return file_path
-                # 处理异常
+
                 except Exception as exception:
                     # 当发生超时异常时，继续下一个循环
                     if isinstance(exception, asyncio.TimeoutError):
@@ -184,7 +194,11 @@ async def zip2pdf(zip_path: Path) -> Path:
             if file.suffix.lower() in valid_extensions:
                 image_files.append(file)
 
-        pdf_data = img2pdf.convert([str(img) for img in image_files])
+        # 防止阻塞bot
+        pdf_data = await asyncio.to_thread(
+            img2pdf.convert, [str(img) for img in image_files]
+        )
+
         if not pdf_data:
             raise Exception("生成PDF文件失败: 图片数据为空")
 
@@ -195,7 +209,7 @@ async def zip2pdf(zip_path: Path) -> Path:
             if config.pdf_pwd:
                 # 使用gid作为密码
                 pwd = zip_path.stem.split("_")[0]
-                encrypt_pdf(pdf_path, pwd)
+                await asyncio.to_thread(encrypt_pdf, pdf_path, pwd)
 
             return pdf_path
         except Exception as e:
@@ -230,3 +244,18 @@ async def get_pdf(url) -> tuple[Path | None, str]:
     """
     gid, token = parse_gallery_url(url)
     return await get_pdf_with_pwd(gid, token), gid
+
+
+async def abot_checkin():
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            f"{config.base_api}/checkin", json={"apikey": config.apikey}
+        ) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                if data["code"] == 0:
+                    logger.info("Abot checkin successful")
+                else:
+                    logger.warning(f"Abot checkin failed: {data['msg']}")
+            else:
+                logger.error(f"Abot checkin failed with status code: {resp.status}")
